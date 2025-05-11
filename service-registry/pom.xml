@@ -9,13 +9,13 @@
 <!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
 <!--    </parent>-->
     <parent>
-        <groupId>com.edwinrhc</groupId>
-        <artifactId>ecommerce-microservices</artifactId>
+        <groupId>com.cerad</groupId>
+        <artifactId>cerad-system</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>com.edwinrhc</groupId>
+<!--    <groupId>com.cerad</groupId>-->
     <artifactId>service-registry</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>service-registry</name>
