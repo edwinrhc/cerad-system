@@ -1,0 +1,6 @@
+# Para cambiar de rama
+
+git checkout -b feature/login
+git add .
+git commit -m "Archivo de configuración para auth-service feature login"
+git push origin feature/login
