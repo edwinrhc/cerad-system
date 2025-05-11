@@ -1,6 +1,6 @@
 package com.cerad.authservice.jwt;
 
-import com.edwinrhc.authservice.entity.User;
+import com.cerad.authservice.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +16,7 @@ import java.util.Objects;
 public class CustomerUsersDetailsService implements UserDetailsService {
 
     @Autowired
-    com.edwinrhc.authservice.repository.UserRepository userRepository;
+    com.cerad.authservice.repository.UserRepository userRepository;
 
     private User userDetail;
 
