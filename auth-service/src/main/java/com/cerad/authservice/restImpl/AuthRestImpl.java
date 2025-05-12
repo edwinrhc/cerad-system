@@ -29,13 +29,7 @@ public class AuthRestImpl implements AuthRest {
 
     @Override
     public ResponseEntity<ApiResponse> login(LoginDTO loginDTO) {
-/*        try{
-            return authService.login(loginDTO);
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
-        return AuthUtils.getResponseEntity(AuthConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);*/
-   return null;
+        return authService.login(loginDTO);
     }
 
     @Override
