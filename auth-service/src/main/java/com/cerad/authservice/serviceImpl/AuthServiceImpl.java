@@ -20,10 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -82,7 +86,39 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<ApiResponse> login(LoginDTO loginDTO) {
-        return null;
+        log.info("Inside login");
+        try{
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
+            if(auth.isAuthenticated()){
+                if(customerUsersDetailsService.getUserDetail().getStatus().equals("true")){
+
+                    String token = jwtUtil.generateToken(
+                            customerUsersDetailsService.getUserDetail().getEmail(),
+                            customerUsersDetailsService.getUserDetail().getRole()
+                    );
+                    Map<String,String> tokenMap = new HashMap<>();
+                    tokenMap.put("token",token);
+                    //Crear respuesta correctamente
+                    return AuthUtils.apiResponseEntity("Login "+ AuthConstants.SUCCESSFUL.toLowerCase(),tokenMap, HttpStatus.OK);
+                }else{
+                    return AuthUtils.apiResponseEntity(
+                            AuthConstants.INVALID_DATA,
+                            null,
+                            HttpStatus.BAD_REQUEST
+                    );
+                }
+            }
+
+        }catch(Exception ex){
+            log.error("Error al login",ex);
+        }
+
+        return AuthUtils.apiResponseEntity(
+                AuthConstants.BAD_CREDENTIALS,
+                null,
+                HttpStatus.BAD_REQUEST
+        );
     }
 
     @Override
