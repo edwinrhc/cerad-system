@@ -1,0 +1,4 @@
+DOC-001|Cliente Prueba|2024-05-12T15:30:00
+P001|Producto A|100.50
+P002|Producto B|250.75
+P003|Producto C|50.00
