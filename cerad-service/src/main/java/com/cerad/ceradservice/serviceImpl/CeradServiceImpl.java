@@ -5,6 +5,7 @@ import com.cerad.ceradservice.entity.Header;
 import com.cerad.ceradservice.repository.DetailRepository;
 import com.cerad.ceradservice.repository.HeaderRepository;
 import com.cerad.ceradservice.service.CeradService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,11 +20,13 @@ public class CeradServiceImpl implements CeradService {
     }
 
     @Override
+    @Transactional
     public Header saveHeader(Header header) {
-        return headerRepository.save(header);
+        return headerRepository.saveAndFlush(header);
     }
 
     @Override
+    @Transactional
     public Detail saveDetail(Detail detail) {
         return detailRepository.save(detail);
     }
@@ -33,4 +36,6 @@ public class CeradServiceImpl implements CeradService {
         return headerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Header no encontrado con ID: " + id));
     }
+
+
 }

@@ -8,4 +8,5 @@ public interface CeradService {
     Header saveHeader(Header header);
     Detail saveDetail(Detail detail);
     Header findHeaderById(Long id);
+
 }

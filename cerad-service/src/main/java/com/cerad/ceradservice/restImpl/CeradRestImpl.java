@@ -1,5 +1,6 @@
 package com.cerad.ceradservice.restImpl;
 
+import com.cerad.ceradservice.dto.UploadResponseDTO;
 import com.cerad.ceradservice.entity.Header;
 import com.cerad.ceradservice.rest.CeradRest;
 import com.cerad.ceradservice.service.CeradService;
@@ -14,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 public class CeradRestImpl implements CeradRest {
@@ -30,17 +33,24 @@ public class CeradRestImpl implements CeradRest {
     }
 
     @Override
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<UploadResponseDTO> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             // 1. Guardar el archivo en una ruta temporal del sistema (dinámica)
             File tempFile = File.createTempFile("cerad-", ".txt");
             file.transferTo(tempFile);
 
             // 2. Guardar Header (mock, luego lo harás dinámico con contenido del archivo)
+            List<String> allLines = Files.readAllLines(tempFile.toPath());
+            String[] parts = allLines.get(0).split("\\|");
+            if(parts.length < 3){
+                throw new IllegalArgumentException("Formato de encabezado inválido");
+            }
+
             Header header = new Header();
-            header.setDocumentNumber("DOC-001");
-            header.setClientName("Cliente Prueba");
-            header.setUploadDate(LocalDateTime.now());
+            header.setDocumentNumber(parts[0]);
+            header.setClientName(parts[1]);
+            header.setUploadDate(LocalDateTime.parse(parts[2]));
+
             Header savedHeader = ceradService.saveHeader(header);
 
             // 3. Preparar JobParameters (incluyendo la ruta del archivo dinámico)
@@ -54,14 +64,17 @@ public class CeradRestImpl implements CeradRest {
             jobLauncher.run(importDetailJob, jobParameters);
 
             // 5. Respuesta exitosa
-            return ResponseEntity.ok("Archivo procesado correctamente");
+            UploadResponseDTO response = new UploadResponseDTO(true, "Archivo procesado correctamente");
+            return ResponseEntity.ok(response);
 
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Error al guardar archivo: " + e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body(new UploadResponseDTO(false, "Error al guardar archivo: " + e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Error al procesar archivo: " + e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body(new UploadResponseDTO(false, "Error al procesar archivo: " + e.getMessage()));
         }
     }
 }
