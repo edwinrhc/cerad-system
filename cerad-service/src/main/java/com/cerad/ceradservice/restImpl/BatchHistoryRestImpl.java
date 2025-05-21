@@ -1,6 +1,7 @@
 package com.cerad.ceradservice.restImpl;
 
 
+import com.cerad.ceradservice.dto.JobExecutionHistoryDTO;
 import com.cerad.ceradservice.rest.BatchHistoryRest;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -30,15 +31,19 @@ public class BatchHistoryRestImpl implements BatchHistoryRest {
 
     /** 2) Obtener las últimas N ejecuciones de un job **/
     @Override
-    public List<JobExecution> listExcetions(@PathVariable("jobName") String jobName,  @RequestParam(name = "count", defaultValue = "10") int count) {
+    public List<JobExecutionHistoryDTO> getJobExecutionHistory(@PathVariable("jobName") String jobName, @RequestParam(name = "count", defaultValue = "10") int count) {
 
-        // Recupera las instancias recientes
-        List<JobInstance> instances =
-                jobExplorer.getJobInstances(jobName,0, count);
-        // Para cada instancia, recoge sus ejecuciones
-        return instances.stream()
-                .flatMap(inst -> jobExplorer.getJobExecutions(inst).stream())
+        List<JobInstance> jobInstances = jobExplorer.getJobInstances(jobName, 0, count);
+
+        return jobInstances.stream()
+                .flatMap(instance -> jobExplorer.getJobExecutions(instance).stream())
+                .map(execution -> new JobExecutionHistoryDTO(
+                        execution.getId(),
+                        execution.getJobInstance().getJobName(),
+                        execution.getStatus().toString(),
+                        execution.getStartTime(),
+                        execution.getEndTime()
+                ))
                 .collect(Collectors.toList());
-
     }
 }
